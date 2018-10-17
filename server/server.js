@@ -30,6 +30,7 @@ app.post('/todos', (req, res) => {
     })
 });
 
+module.exports = {app};
 // var newTodo = new Todo({
 //     text: 'Cook dinner',
 //     completed: false,
