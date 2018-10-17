@@ -4,8 +4,19 @@ const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
 
+const todos = [
+  {text : 'first'},
+  {text : 'second'},
+  {text : 'third'},
+  {text : 'fourth'},
+  {text : 'fifth'}
+];
+
 beforeEach((done) => {
-  Todo.remove({}).then(() => done());
+  Todo.remove({}).then(() => {
+      return Todo.insertMany(todos);
+    //done());
+  }).then(() => done());
 });
 
 describe('Express API server routes POST /todos', () => {
@@ -25,7 +36,7 @@ describe('Express API server routes POST /todos', () => {
           return done(err);
         }
 
-        Todo.find().then((todos) => {
+        Todo.find({text}).then((todos) => {
           expect(todos.length).toBe(1);
           expect(todos[0].text).toBe(text);
           done();
@@ -46,7 +57,7 @@ describe('Express API server routes POST /todos', () => {
         }
 
         Todo.find().then((todos) => {
-          expect(todos.length).toBe(0);
+          expect(todos.length).toBe(5);
           done();
         }).catch((e) => {
           done(e);
@@ -54,33 +65,16 @@ describe('Express API server routes POST /todos', () => {
       });
   });
 
+});
 
-  // test('it should return hello world response', (done) => {
-  // //expect.assertions(1);
-  //   request(app)
-  //     .get('/')
-  //     .expect(200)
-  // //.expect('Content-Length', '15')
-  //     .expect({
-  //       error: 'Page not found!',
-  //       name: 'Todo App v1.0'
-  //     })
-  //     .end(done);
-  // });
-  //
-  // test('it should return users array', (done) => {
-  // //expect.assertions(1);
-  //   request(app)
-  //     .get('/users')
-  //     .expect(200)
-  // //.expect('Content-Length', '15')
-  //     .expect((res) => {
-  //       expect(res.body).toContainEqual({
-  //         name: 'user1',
-  //         age: 26
-  //       })
-  //     })
-  //     .end(done);
-  // });
-
+describe('Express API server routes GET /todos', () => {
+  test('it should get all todos', (done) => {
+    request(app)
+      .get('/todos')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todos.length).toBe(5);
+      })
+      .end(done);
+  });
 });
