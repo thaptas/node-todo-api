@@ -33,9 +33,7 @@ app.post('/todos', (req, res) => {
 
 app.get('/todos', (req, res) => {
   Todo.find().then((todos) => {
-    res.send({
-      todos
-    });
+    res.send({todos});
   }, (e) => {
     res.status(400).send(e);
   });
@@ -65,10 +63,10 @@ app.get('/todos/:id', (req, res) => {
 
 app.delete('/todos/:id', (req, res) => {
   //get the id variable
+  var id = req.params.id;
   try {
-
     //validate id -- return 404
-    if (!ObjectID.isValid(req.params.id)){
+    if (!ObjectID.isValid(id)){
       throw new Error('Todo ID is invalid');
     }
   }
@@ -76,28 +74,16 @@ app.delete('/todos/:id', (req, res) => {
       return res.status(404).send();
   }
 
-  Todo.findByIdAndDelete(req.params.id).then((todo) => {
-    //remove todo by id
-    //success
+  Todo.findByIdAndDelete(id).then((todo) => {
     if (!todo) {
       return res.status(404).send();
     }
 
-    res.send({
-      todo
-    });
+    res.send({todo});
 
   }, (e) => {
     res.status(400).send();
   });
-
-
-
-  //if no doc send 404
-  //if doc send doc back with 200
-
-  //error 400 with empty body
-
 });
 
 module.exports = {app};
