@@ -53,15 +53,14 @@ app.get('/todos/:id', (req, res) => {
   }
 
   Todo.findById(req.params.id).then((todo) => {
-    res.send({
-      todo
-    });
+    res.send({todo});
   }, (e) => {
     res.status(400).send();
   });
 });
 
 app.delete('/todos/:id', (req, res) => {
+  console.log(req.params);
   //get the id variable
   var id = req.params.id;
   try {

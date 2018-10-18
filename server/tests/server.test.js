@@ -105,3 +105,42 @@ describe('Express API server routes GET /todos', () => {
       .end(done);
   });
 });
+
+describe('Express API server routes DELETE /todos', () => {
+  test('should remove todo', (done) => {
+    var hexId = todos[1]._id.toHexString();
+
+    request(app)
+      .delete(`/todos/${hexId}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo._id).toBe(hexId);
+      })
+      .end((err, res) => {
+        if (err) {
+          return done(err);
+        }
+
+        Todo.findById(hexId).then((todo) => {
+          expect(todo).toBeNull();
+          done();
+        }).catch((e) => done(e));
+      });
+  });
+
+  test('should send 404 if todo not found', (done) => {
+    var objID = new ObjectID();
+
+    request(app)
+      .delete(`/todos/${objID.toHexString()}`)
+      .expect(404)
+      .end(done);
+  });
+
+  test('should send 404 if non-object id', (done) => {
+    request(app)
+      .delete('/todos/123abc')
+      .expect(404)
+      .end(done);
+  });
+});
