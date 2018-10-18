@@ -1,15 +1,15 @@
 const request = require('supertest');
-
+const {ObjectID} = require('mongodb');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
 
 const todos = [
-  {text : 'first'},
-  {text : 'second'},
-  {text : 'third'},
-  {text : 'fourth'},
-  {text : 'fifth'}
+  {text : 'first', _id: new ObjectID()},
+  {text : 'second', _id: new ObjectID()},
+  {text : 'third', _id: new ObjectID()},
+  {text : 'fourth', _id: new ObjectID()},
+  {text : 'fifth', _id: new ObjectID()}
 ];
 
 beforeEach((done) => {
@@ -75,6 +75,26 @@ describe('Express API server routes GET /todos', () => {
       .expect((res) => {
         expect(res.body.todos.length).toBe(5);
       })
+      .end(done);
+  });
+
+  test('it should get one todo', (done) => {
+
+      request(app)
+        .get(`/todos/${todos[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.todo.text).toBe(todos[0].text);
+        })
+        .end(done);
+  });
+
+  test('should return 404 if todo not found', (done) => {
+    var objID = new ObjectID();
+
+    request(app)
+      .get(`/todos/${objID}.toHexString()}`)
+      .expect(404)
       .end(done);
   });
 });
