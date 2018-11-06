@@ -212,3 +212,58 @@ describe('Express API server routes POST /users', () => {
       .end(done);
   });
 });
+
+describe('Express API server routes POST /users/login', () => {
+  test('should login user and return token', (done) => {
+    var email = users[1].email;
+    var password = users[1].password;
+
+    request(app)
+      .post('/users/login')
+      .send({email, password})
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toBeTruthy();
+      })
+      .end((err, res) => {
+        if(err) {
+          return done(err);
+        }
+
+        User.findById(users[1]._id).then((user) => {
+          expect(user.tokens[0]).toMatchObject({
+            access: 'auth',
+            token: res.headers['x-auth']
+          });
+          done();
+        }).catch((e) => {
+          done(e);
+        });
+      });
+  });
+
+  test('it should reject invlid login', (done) => {
+    var email = users[1].email;
+    var password = 'some password';
+
+    request(app)
+      .post('/users/login')
+      .send({email, password})
+      .expect(400)
+      .expect((res) => {
+        expect(res.headers['x-auth']).not.toBeTruthy();
+      })
+      .end((err, res) => {
+        if(err) {
+          return done(err);
+        }
+
+        User.findById(users[1]._id).then((user) => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((e) => {
+          done(e);
+        });
+      });
+  });
+});
