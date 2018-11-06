@@ -267,3 +267,29 @@ describe('Express API server routes POST /users/login', () => {
       });
   });
 });
+
+describe('Express API server routes DELEte /users/me/token', () => {
+  test('should remove auth token on logout', (done) => {
+    //DELete req to /users/me/tokens
+    //set x-auth equal to tokens
+    // 200
+    // find user, verify that tokens array has length of zero
+
+    request(app)
+      .delete('/users/me/token')
+      .set('x-auth', users[0].tokens[0].token)
+      .expect(200)
+      .end((err, res) => {
+        if(err) {
+          return done(err);
+        }
+
+        User.findById(users[0]._id).then((user) => {
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((e) => {
+          done(e);
+        });
+      });
+  });
+});
