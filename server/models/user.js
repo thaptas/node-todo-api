@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 const jwt = require('jsonwebtoken');
 const _ = require('lodash');
+const bcrypt = require('bcryptjs');
 
 mongoose.set('useCreateIndex', true);
 
@@ -77,6 +78,29 @@ UserSchema.statics.findByToken = function (token) {
   });
 
 };
+
+UserSchema.pre('save', function(next) {
+  var user = this;
+
+  if(user.isModified('password')){
+    //salting passwords
+    bcrypt.genSalt(10, (err, salt) => {
+      bcrypt.hash(user.password, salt, (err, hash) => {
+        //console.log(hash);
+        user.password = hash;
+        next();
+      });
+    });
+
+    // var hashedPassword = '$2a$10$mOTZhb.ltU4zWsIXoQcZ2unRedKiE7x8qEo4volI0rnSfpBG6.pZm';
+    //
+    // bcrypt.compare(password, hashedPassword, (err, res) => {
+    //   console.log(res);
+    // });
+  } else {
+    next();
+  }
+});
 
 var User = mongoose.model('User', UserSchema);
 
