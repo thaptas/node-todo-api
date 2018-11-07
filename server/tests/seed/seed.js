@@ -19,15 +19,19 @@ const users = [{
   _id: userTwoId,
   name: 'Tomasz',
   email: 'tomasz1@haptas.pl',
-  password: 'tomasz1@haptas.pl'
+  password: 'tomasz1@haptas.pl',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id: userTwoId, access: 'auth'}, 'secretABC123').toString()
+  }]
 }];
 
 const todos = [
-  {text : 'first', _id: new ObjectID()},
-  {text : 'second', _id: new ObjectID()},
-  {text : 'third', _id: new ObjectID()},
-  {text : 'fourth', _id: new ObjectID()},
-  {text : 'fifth', _id: new ObjectID()}
+  {text : 'first', _id: new ObjectID(), _creator: userOneId},
+  {text : 'second', _id: new ObjectID(), _creator: userOneId},
+  {text : 'third', _id: new ObjectID(), _creator: userTwoId},
+  {text : 'fourth', _id: new ObjectID(), _creator: userOneId},
+  {text : 'fifth', _id: new ObjectID(), _creator: userTwoId}
 ];
 
 const populateUsers = (done) => {
